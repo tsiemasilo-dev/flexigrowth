@@ -1161,22 +1161,49 @@
             margin-top: 4rem;
         }
 
-        /* Core Values Grid - 3 columns on desktop */
+        /* Core Values Grid - Horizontal Scroll Animation */
         .core-values-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
             gap: 1.5rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--flexi-green) #e5e5e5;
+        }
+
+        .core-values-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .core-values-grid::-webkit-scrollbar-track {
+            background: #e5e5e5;
+            border-radius: 4px;
+        }
+
+        .core-values-grid::-webkit-scrollbar-thumb {
+            background: var(--flexi-green);
+            border-radius: 4px;
+        }
+
+        .core-values-grid .glass-card {
+            flex: 0 0 calc(33.333% - 1rem);
+            min-width: 300px;
+            scroll-snap-align: start;
         }
 
         @media (max-width: 1024px) {
-            .core-values-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .core-values-grid .glass-card {
+                flex: 0 0 calc(50% - 0.75rem);
+                min-width: 280px;
             }
         }
 
         @media (max-width: 640px) {
-            .core-values-grid {
-                grid-template-columns: 1fr;
+            .core-values-grid .glass-card {
+                flex: 0 0 85%;
+                min-width: 260px;
             }
         }
 
@@ -1558,6 +1585,27 @@
                 right: -10px;
             }
 
+            .split-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .split-grid .who-we-are-intro {
+                order: 1;
+            }
+
+            .split-grid .mv-container {
+                order: 2;
+            }
+
+            .services-section .split-grid .services-image {
+                order: 1;
+            }
+
+            .services-section .split-grid .services-content {
+                order: 2;
+            }
+
             .values-grid {
                 grid-template-columns: 1fr;
             }
@@ -1758,7 +1806,7 @@
                         <span class="subsection-title">Who We Are</span>
                     </div>
                     <div class="split-grid">
-                        <div>
+                        <div class="who-we-are-intro">
                             <h2 style="margin-top: 0;">Restoring dignity through financial inclusion.</h2>
                             <p style="margin-bottom: 1.25rem;">Flex Growth Financial Services is a mission-driven
                                 lending
@@ -2415,7 +2463,7 @@
         <!-- Services Section -->
         <section id="services" class="services-section neutral-section-bg">
             <div class="container split-grid">
-                <div>
+                <div class="services-content">
                     <h2>Integrated Empowerment Model</h2>
                     <p style="margin-bottom: 2rem;">FlexGrowth provides more than just credit—we offer an integrated
                         financial model tailored for SMMEs in underserved markets.</p>
@@ -2430,7 +2478,7 @@
                                 Support:</strong> Education, Housing, and Funeral loans.</li>
                     </ul>
                 </div>
-                <div style="position: relative; background: #eee; min-height: 300px;">
+                <div class="services-image" style="position: relative; background: #eee; min-height: 300px;">
                     <img src="static/images/empowerment.jpg" alt="Integrated Empowerment Model" style="width: 100%; height: 400px; object-fit: cover; display: block;" class="brand-mask" onerror="this.style.display='none'; this.parentElement.style.background='#231f20';">
                     <div
                         style="position: absolute; top: -20px; left: -20px; width: 80px; height: 80px; background: var(--flexi-green); z-index: 1;">
