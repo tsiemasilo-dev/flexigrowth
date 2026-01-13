@@ -537,6 +537,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center top;
             transition: transform 0.7s ease;
         }
 
@@ -1168,23 +1169,56 @@
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 1rem;
-            scrollbar-width: thin;
-            scrollbar-color: var(--flexi-green) #e5e5e5;
+            padding-bottom: 1.5rem;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
         .core-values-grid::-webkit-scrollbar {
-            height: 8px;
+            display: none;
         }
 
-        .core-values-grid::-webkit-scrollbar-track {
-            background: #e5e5e5;
-            border-radius: 4px;
+        /* Custom Scrollbar Track */
+        .core-values-scrollbar-container {
+            position: relative;
+            margin-top: 1.5rem;
         }
 
-        .core-values-grid::-webkit-scrollbar-thumb {
-            background: var(--flexi-green);
-            border-radius: 4px;
+        .core-values-scrollbar-track {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #e8f5e9 0%, #f5f5f5 50%, #e8f5e9 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .core-values-scrollbar-thumb {
+            position: absolute;
+            height: 100%;
+            width: 30%;
+            background: linear-gradient(90deg, #1a9f4a, var(--flexi-green), #4ade80);
+            border-radius: 10px;
+            left: 0;
+            transition: left 0.1s ease-out;
+            box-shadow: 0 2px 8px rgba(34, 214, 105, 0.4);
+        }
+
+        .core-values-scrollbar-thumb::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .core-values-grid .glass-card {
@@ -2100,6 +2134,13 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Custom Scrollbar -->
+                    <div class="core-values-scrollbar-container">
+                        <div class="core-values-scrollbar-track">
+                            <div class="core-values-scrollbar-thumb" id="coreValuesThumb"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -2638,12 +2679,9 @@
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    // This will trigger every time the element enters or leaves the viewport
                     if (entry.isIntersecting) {
                         entry.target.classList.add('revealed');
                     } else {
-                        // Removing the class when it leaves the viewport allows it to re-animate
-                        // when scrolling back up or down
                         entry.target.classList.remove('revealed');
                     }
                 });
@@ -2655,15 +2693,57 @@
             revealElements.forEach(el => observer.observe(el));
         }
 
+        function initCoreValuesScroll() {
+            const coreValuesGrid = document.querySelector('.core-values-grid');
+            const scrollThumb = document.getElementById('coreValuesThumb');
+            const coreValuesSection = document.querySelector('.about-subsection.solution-section-bg');
+            
+            if (!coreValuesGrid || !scrollThumb || !coreValuesSection) return;
+
+            // Update custom scrollbar position when manually scrolling
+            coreValuesGrid.addEventListener('scroll', () => {
+                const scrollPercentage = coreValuesGrid.scrollLeft / (coreValuesGrid.scrollWidth - coreValuesGrid.clientWidth);
+                const thumbPosition = scrollPercentage * (100 - 30); // 30% is thumb width
+                scrollThumb.style.left = thumbPosition + '%';
+            });
+
+            // Scroll cards based on page scroll position
+            let lastScrollY = window.scrollY;
+            let isInView = false;
+            
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    isInView = entry.isIntersecting;
+                });
+            }, { threshold: 0.3 });
+            
+            sectionObserver.observe(coreValuesSection);
+
+            window.addEventListener('scroll', () => {
+                if (!isInView) return;
+                
+                const currentScrollY = window.scrollY;
+                const scrollDelta = currentScrollY - lastScrollY;
+                
+                // Calculate scroll amount based on scroll direction
+                const scrollAmount = scrollDelta * 2;
+                coreValuesGrid.scrollLeft += scrollAmount;
+                
+                lastScrollY = currentScrollY;
+            }, { passive: true });
+        }
+
         // Initialize on load to prevent errors
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 updateCalculator();
                 initScrollReveal();
+                initCoreValuesScroll();
             });
         } else {
             updateCalculator();
             initScrollReveal();
+            initCoreValuesScroll();
         }
     </script>
 </body>
